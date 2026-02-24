@@ -21,6 +21,3 @@ playwright-report/
 # Don't accidentally add non-linux snapshots to the VRTs
 test/vrt/**/*.png
 !test/vrt/**/*-linux.png
-
-# Snyk Security Extension - AI Rules (auto-generated)
-.cursor/rules/snyk_rules.mdc
