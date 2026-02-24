@@ -22,6 +22,11 @@
                 <span class="label__text">Exploit: {{metadata.exploitMaturity}}</span>
             </div>
             {{/if}}
+            {{#if metadata.packageName}}
+            <div class="label label--epss">
+                <span class="label__text">EPSS: {{#if metadata.epss}}{{metadata.epss.formatted}}{{else}}N/A{{/if}}</span>
+            </div>
+            {{/if}}
         </div>
 
         <hr/>

@@ -174,8 +174,56 @@ function getExploitMaturity(vuln: any): string | undefined {
   return undefined;
 }
 
+function ordinalSuffix(n: number): string {
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 13) return n + 'th';
+  switch (n % 10) {
+    case 1:
+      return n + 'st';
+    case 2:
+      return n + 'nd';
+    case 3:
+      return n + 'rd';
+    default:
+      return n + 'th';
+  }
+}
+
+function formatEpssDisplay(
+  probability: string | undefined,
+  percentile: string | undefined,
+): string | null {
+  if (probability == null || probability === '') return null;
+  const probNum = parseFloat(probability);
+  if (Number.isNaN(probNum)) return null;
+  const pct = probNum * 100;
+  const pctStr = pct < 1 ? '.' + pct.toFixed(2).replace(/^0\./, '') + '%' : pct.toFixed(2) + '%';
+  if (percentile != null && percentile !== '') {
+    const percNum = parseFloat(percentile);
+    if (!Number.isNaN(percNum)) {
+      const rank = Math.round(percNum * 100);
+      return `${pctStr} (${ordinalSuffix(rank)} percentile)`;
+    }
+  }
+  return pctStr;
+}
+
 function metadataForVuln(vuln: any) {
   const { cveSpaced, cveLineBreaks } = concatenateCVEs(vuln);
+
+  const packageName = vuln.packageName || undefined;
+  const epssDetails = vuln.epssDetails;
+  const epss =
+    packageName && epssDetails && epssDetails.probability != null
+      ? {
+          probability: epssDetails.probability,
+          percentile: epssDetails.percentile,
+          formatted: formatEpssDisplay(
+            epssDetails.probability,
+            epssDetails.percentile,
+          ),
+        }
+      : null;
 
   return {
     id: vuln.id,
@@ -197,6 +245,8 @@ function metadataForVuln(vuln: any) {
     publicationTime: dateFromDateTimeString(vuln.publicationTime || ''),
     license: vuln.license || undefined,
     exploitMaturity: getExploitMaturity(vuln),
+    packageName,
+    epss,
   };
 }
 

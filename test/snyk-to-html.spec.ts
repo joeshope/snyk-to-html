@@ -669,10 +669,16 @@ describe('test running SnykToHtml.run', () => {
           );
 
           // We expect the license issues' card to not have the reachability signal in the labels section
-          // only the severity
-          expect(licenseIssue).toMatch(
-            /<div class="card__labels">\s*<div class="label label--high">\s*<span class="label__text">high severity<\/span>\s*<\/div>\s*<\/div>/,
+          // only the severity (and EPSS when packageName is present)
+          expect(licenseIssue).toContain(
+            '<div class="label label--high">',
           );
+          expect(licenseIssue).toContain(
+            '<span class="label__text">high severity</span>',
+          );
+          expect(licenseIssue).not.toContain('Reachable');
+          expect(licenseIssue).not.toContain('No Reachable Path Found');
+          expect(licenseIssue).toContain('EPSS:'); // packageName present so EPSS label shown
 
           done();
         } catch (error: any) {
